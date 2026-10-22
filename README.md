@@ -1,25 +1,25 @@
-# Calculadora full-stack
+# Full-stack calculator
 
-Aplicación de calculadora con **React (TypeScript)** en el frontend y un **microservicio REST en Go** en el backend. El frontend valida entradas en el cliente y delega el cálculo al API.
+A calculator app with a **React (TypeScript)** frontend and a **Go REST microservice** backend. The frontend validates input on the client and delegates arithmetic to the API.
 
-## Estructura del repositorio
+## Repository layout
 
 ```
 Calculator/
-├── backend/          # API REST en Go
-├── frontend/         # UI React + Vite
+├── backend/          # Go REST API
+├── frontend/         # React + Vite UI
 ├── docker-compose.yml
-├── scripts/          # Ejecutar tests y cobertura
+├── scripts/          # Run tests and coverage
 └── README.md
 ```
 
-## Requisitos
+## Requirements
 
 - [Go](https://go.dev/) 1.22+
 - [Node.js](https://nodejs.org/) 20+
-- (Opcional) Docker y Docker Compose
+- (Optional) Docker and Docker Compose
 
-## Desarrollo local
+## Local development
 
 ### Backend
 
@@ -29,7 +29,7 @@ go mod download
 go run ./cmd/server
 ```
 
-El servidor escucha en `http://localhost:8080`.
+The server listens on `http://localhost:8080`.
 
 ### Frontend
 
@@ -39,21 +39,21 @@ npm install
 npm run dev
 ```
 
-Abre `http://localhost:5173`. Vite hace proxy de `/api` y `/health` al backend en el puerto 8080.
+Open `http://localhost:5173`. Vite proxies `/api` and `/health` to the backend on port 8080.
 
-Variables de entorno del frontend:
+Frontend environment variables:
 
-| Variable        | Descripción                                      |
-|-----------------|--------------------------------------------------|
-| `VITE_API_URL`  | Base URL del API (vacío = mismo origen / proxy) |
+| Variable       | Description                                      |
+|----------------|--------------------------------------------------|
+| `VITE_API_URL` | API base URL (empty = same origin / dev proxy)   |
 
-## API REST
+## REST API
 
 ### `GET /health`
 
-Comprueba que el servicio está activo.
+Checks that the service is up.
 
-**Respuesta 200**
+**200 response**
 
 ```json
 { "status": "ok" }
@@ -61,17 +61,17 @@ Comprueba que el servicio está activo.
 
 ### `POST /api/calculate`
 
-Ejecuta una operación.
+Runs a calculation.
 
-**Cuerpo (JSON)**
+**Request body (JSON)**
 
-| Campo        | Tipo   | Descripción |
-|--------------|--------|-------------|
-| `operation`  | string | `add`, `subtract`, `multiply`, `divide`, `power`, `sqrt`, `percent` |
-| `a`          | number | Primer operand (o valor para `sqrt`) |
-| `b`          | number | Segundo operand (ignorado en `sqrt`) |
+| Field       | Type   | Description |
+|-------------|--------|-------------|
+| `operation` | string | `add`, `subtract`, `multiply`, `divide`, `power`, `sqrt`, `percent` |
+| `a`         | number | First operand (or value for `sqrt`) |
+| `b`         | number | Second operand (ignored for `sqrt`) |
 
-**Ejemplo — suma**
+**Example — addition**
 
 ```bash
 curl -s -X POST http://localhost:8080/api/calculate \
@@ -83,18 +83,18 @@ curl -s -X POST http://localhost:8080/api/calculate \
 { "result": 5 }
 ```
 
-**Ejemplo — división por cero (422)**
+**Example — division by zero (422)**
 
 ```json
 { "error": "division by zero" }
 ```
 
-**Semántica de operaciones**
+**Operation semantics**
 
-- **percent**: `result = (a / 100) * b` (por ejemplo, 20 % de 50 → 10).
-- **sqrt**: solo se usa `a`; debe ser ≥ 0.
+- **percent**: `result = (a / 100) * b` (e.g. 20% of 50 → 10).
+- **sqrt**: only `a` is used; it must be ≥ 0.
 
-## Tests y cobertura
+## Tests and coverage
 
 ### Backend
 
@@ -104,7 +104,7 @@ go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out -o coverage.html
 ```
 
-Si no tenés Go instalado localmente, podés usar la imagen oficial:
+If Go is not installed locally, you can use the official image:
 
 ```bash
 docker run --rm -v "%cd%:/app" -w /app golang:1.22-alpine go test ./... -coverprofile=coverage.out
@@ -117,31 +117,31 @@ cd frontend
 npm run test:coverage
 ```
 
-Los informes quedan en `frontend/coverage/`.
+Reports are written to `frontend/coverage/`.
 
-### Todo el proyecto (Windows)
+### Entire project (Windows)
 
 ```powershell
 .\scripts\test-all.ps1
 ```
 
-## Docker (opcional)
+## Docker (optional)
 
 ```bash
 docker compose up --build
 ```
 
-- Frontend: `http://localhost:3000` (nginx sirve la SPA y hace proxy al API).
+- Frontend: `http://localhost:3000` (nginx serves the SPA and proxies to the API).
 - Backend: `http://localhost:8080`.
 
-## Decisiones de diseño
+## Design decisions
 
-1. **Capa de dominio en Go** (`internal/calculator`): lógica pura, sin HTTP, fácil de testear.
-2. **Un único endpoint** `POST /api/calculate`: el cliente envía la operación y operands; evita proliferar rutas y mantiene el contrato estable.
-3. **Validación en dos capas**: el frontend da feedback inmediato; el backend rechaza datos inválidos y casos como división por cero o raíz de negativo (422).
-4. **Frontend delgado**: `calculatorApi` encapsula HTTP; `validation` concentra reglas de UI; `App` solo orquesta estado.
-5. **CORS** en el backend para desarrollo y despliegues donde el front no pase por el mismo proxy.
+1. **Go domain layer** (`internal/calculator`): pure logic, no HTTP, easy to unit test.
+2. **Single endpoint** `POST /api/calculate`: the client sends operation and operands; avoids route sprawl and keeps the contract stable.
+3. **Two-layer validation**: the frontend gives immediate feedback; the backend rejects invalid data and edge cases such as division by zero or negative square roots (422).
+4. **Thin frontend**: `calculatorApi` wraps HTTP; `validation` holds UI rules and numeric input sanitization; `App` only orchestrates state.
+5. **CORS** on the backend for local development and deployments where the UI does not share the API origin.
 
-## Licencia
+## License
 
-Uso educativo / demostración.
+Educational / demonstration use.
