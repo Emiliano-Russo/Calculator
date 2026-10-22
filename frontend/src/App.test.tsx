@@ -1,0 +1,37 @@
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import App from "./App";
+import * as api from "./api/calculatorApi";
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+describe("App", () => {
+  it("shows validation error for invalid input", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.clear(screen.getByLabelText("Primer operand"));
+    await user.type(screen.getByLabelText("Primer operand"), "x");
+    await user.click(screen.getByRole("button", { name: /calcular/i }));
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+  });
+
+  it("displays result from API", async () => {
+    vi.spyOn(api, "calculate").mockResolvedValue({ result: 7 });
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.clear(screen.getByLabelText("Primer operand"));
+    await user.type(screen.getByLabelText("Primer operand"), "3");
+    await user.clear(screen.getByLabelText("Segundo operand"));
+    await user.type(screen.getByLabelText("Segundo operand"), "4");
+    await user.click(screen.getByRole("button", { name: /calcular/i }));
+
+    expect(await screen.findByText("7")).toBeInTheDocument();
+  });
+});

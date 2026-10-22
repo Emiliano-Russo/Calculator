@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+backend/coverage.out
+backend/coverage.html
+*.exe
+.DS_Store
+.env
+.env.local
