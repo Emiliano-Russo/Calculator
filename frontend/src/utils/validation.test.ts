@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseNumber, validateInputs } from "./validation";
+import { parseNumber, sanitizeNumericInput, validateInputs } from "./validation";
+
+describe("sanitizeNumericInput", () => {
+  it("strips letters and keeps valid decimals", () => {
+    expect(sanitizeNumericInput("12a3.4x")).toBe("123.4");
+    expect(sanitizeNumericInput("-5.2")).toBe("-5.2");
+    expect(sanitizeNumericInput("abc")).toBe("");
+  });
+});
 
 describe("parseNumber", () => {
   it("parses valid numbers", () => {
@@ -15,7 +23,7 @@ describe("parseNumber", () => {
 
 describe("validateInputs", () => {
   it("flags division by zero client-side", () => {
-    expect(validateInputs("divide", "10", "0")).toMatch(/cero/i);
+    expect(validateInputs("divide", "10", "0")).toMatch(/zero/i);
   });
 
   it("allows sqrt for non-negative a", () => {

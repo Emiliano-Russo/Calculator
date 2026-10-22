@@ -14,9 +14,8 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.clear(screen.getByLabelText("Primer operand"));
-    await user.type(screen.getByLabelText("Primer operand"), "x");
-    await user.click(screen.getByRole("button", { name: /calcular/i }));
+    await user.clear(screen.getByLabelText("First operand"));
+    await user.click(screen.getByRole("button", { name: /calculate/i }));
 
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
@@ -26,11 +25,11 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.clear(screen.getByLabelText("Primer operand"));
-    await user.type(screen.getByLabelText("Primer operand"), "3");
-    await user.clear(screen.getByLabelText("Segundo operand"));
-    await user.type(screen.getByLabelText("Segundo operand"), "4");
-    await user.click(screen.getByRole("button", { name: /calcular/i }));
+    await user.clear(screen.getByLabelText("First operand"));
+    await user.type(screen.getByLabelText("First operand"), "3");
+    await user.clear(screen.getByLabelText("Second operand"));
+    await user.type(screen.getByLabelText("Second operand"), "4");
+    await user.click(screen.getByRole("button", { name: /calculate/i }));
 
     expect(await screen.findByText("7")).toBeInTheDocument();
   });

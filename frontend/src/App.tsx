@@ -4,17 +4,18 @@ import type { Operation } from "./types";
 import {
   operationNeedsSecondOperand,
   parseNumber,
+  sanitizeNumericInput,
   validateInputs,
 } from "./utils/validation";
 
 const OPERATIONS: { value: Operation; label: string }[] = [
-  { value: "add", label: "Suma (+)" },
-  { value: "subtract", label: "Resta (−)" },
-  { value: "multiply", label: "Multiplicación (×)" },
-  { value: "divide", label: "División (÷)" },
-  { value: "power", label: "Potencia (^)" },
-  { value: "sqrt", label: "Raíz cuadrada (√)" },
-  { value: "percent", label: "Porcentaje (%)" },
+  { value: "add", label: "Addition (+)" },
+  { value: "subtract", label: "Subtraction (−)" },
+  { value: "multiply", label: "Multiplication (×)" },
+  { value: "divide", label: "Division (÷)" },
+  { value: "power", label: "Exponent (^)" },
+  { value: "sqrt", label: "Square root (√)" },
+  { value: "percent", label: "Percentage (%)" },
 ];
 
 export default function App() {
@@ -51,7 +52,7 @@ export default function App() {
       setResult(String(response.result));
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Error al calcular el resultado.",
+        err instanceof Error ? err.message : "Failed to calculate the result.",
       );
     } finally {
       setLoading(false);
@@ -61,14 +62,14 @@ export default function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <h1>Calculadora</h1>
-        <p>Operaciones básicas y avanzadas vía API REST</p>
+        <h1>Calculator</h1>
+        <p>Basic and advanced operations via REST API</p>
       </header>
 
       <main className="card">
         <form className="form" onSubmit={handleSubmit}>
           <label className="field">
-            <span>Operación</span>
+            <span>Operation</span>
             <select
               value={operation}
               onChange={(e) => setOperation(e.target.value as Operation)}
@@ -82,13 +83,13 @@ export default function App() {
           </label>
 
           <label className="field">
-            <span>{needsB ? "Primer valor (a)" : "Valor"}</span>
+            <span>{needsB ? "First value (a)" : "Value"}</span>
             <input
               type="text"
               inputMode="decimal"
               value={a}
-              onChange={(e) => setA(e.target.value)}
-              aria-label="Primer operand"
+              onChange={(e) => setA(sanitizeNumericInput(e.target.value))}
+              aria-label="First operand"
             />
           </label>
 
@@ -96,21 +97,21 @@ export default function App() {
             <label className="field">
               <span>
                 {operation === "percent"
-                  ? "Segundo valor (base)"
-                  : "Segundo valor (b)"}
+                  ? "Second value (base)"
+                  : "Second value (b)"}
               </span>
               <input
                 type="text"
                 inputMode="decimal"
                 value={b}
-                onChange={(e) => setB(e.target.value)}
-                aria-label="Segundo operand"
+                onChange={(e) => setB(sanitizeNumericInput(e.target.value))}
+                aria-label="Second operand"
               />
             </label>
           )}
 
           <button type="submit" className="btn" disabled={loading}>
-            {loading ? "Calculando…" : "Calcular"}
+            {loading ? "Calculating…" : "Calculate"}
           </button>
         </form>
 
@@ -122,7 +123,7 @@ export default function App() {
 
         {result !== null && !error && (
           <div className="message message--result" aria-live="polite">
-            <span className="message__label">Resultado</span>
+            <span className="message__label">Result</span>
             <span className="message__value">{result}</span>
           </div>
         )}

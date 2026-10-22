@@ -34,7 +34,7 @@ func (o Operation) Valid() bool {
 }
 
 func Evaluate(op Operation, a, b float64) (float64, error) {
-	if math.IsNaN(a) || math.IsNaN(b) || math.IsInf(a) || math.IsInf(b) {
+	if math.IsNaN(a) || math.IsNaN(b) || math.IsInf(a, 0) || math.IsInf(b, 0) {
 		return 0, ErrInvalidOperand
 	}
 
